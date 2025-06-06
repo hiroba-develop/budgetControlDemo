@@ -21,7 +21,9 @@ const App: React.FC = () => {
   const isOnboarded = localStorage.getItem("isOnboarded") === "true";
 
   return (
-    <Router>
+    <Router basename="/budgetControlDemo">
+      {" "}
+      {/* basename を追加 */}
       <ScrollToTop />
       <Routes>
         <Route path="/onboarding" element={<Onboarding />} />
