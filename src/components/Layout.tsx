@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import {
-  Home,
-  FileText,
-  Settings as SettingsIcon,
-  Plus,
-  TrendingUp,
-  Receipt,
-} from "lucide-react";
+import { Home, FileText, Settings as SettingsIcon } from "lucide-react";
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -56,7 +49,7 @@ const Layout: React.FC = () => {
       </nav>
 
       {/* フローティングアクションボタン */}
-      <div className="fixed bottom-20 right-4 z-50">
+      {/* <div className="fixed bottom-20 right-4 z-50">
         {showFABMenu && (
           <div className="absolute bottom-16 right-0 flex flex-col gap-3 items-end">
             <Link
@@ -89,7 +82,7 @@ const Layout: React.FC = () => {
         >
           <Plus size={24} className="text-white" />
         </button>
-      </div>
+      </div> */}
 
       {/* FABメニューの背景 */}
       {showFABMenu && (

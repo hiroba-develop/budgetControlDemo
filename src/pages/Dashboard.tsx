@@ -29,6 +29,11 @@ const Dashboard: React.FC = () => {
   const balance = actualIncome - actualExpense;
   const achievementRate = (actualIncome / monthlyTarget) * 100;
 
+  // 10年目標進捗ゲージ用のダミーデータ
+  const tenYearTarget = 50000000;
+  const accumulatedProgress = 30000000; // ダミーの進捗（3,000万円）
+  const tenYearProgressRate = (accumulatedProgress / tenYearTarget) * 100;
+
   const recentTransactions: Transaction[] = [
     {
       id: "1",
@@ -108,7 +113,53 @@ const Dashboard: React.FC = () => {
       </header>
 
       {/* メインコンテンツ */}
-      <div className="pt-16 px-4 pb-4">
+      <div className="pt-20 px-4 pb-4">
+        {/* 10年目標進捗ゲージ */}
+        <div className="px-4 pb-4">
+          <div className="bg-gradient-to-br from-blue-500 to-violet-600 rounded-lg p-6">
+            <div className="flex flex-col items-center">
+              <h2 className="text-white text-lg font-medium mb-4">
+                10年目標進捗
+              </h2>
+
+              <div className="text-white text-4xl font-bold mb-1">
+                {(accumulatedProgress / 10000).toFixed(0)}万円
+              </div>
+              <div className="text-white/80 text-sm mb-6">
+                目標: {(tenYearTarget / 10000).toFixed(0)}万円
+              </div>
+
+              <div className="relative w-32 h-32">
+                <svg className="transform -rotate-90 w-32 h-32">
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth="12"
+                    fill="none"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="white"
+                    strokeWidth="12"
+                    fill="none"
+                    strokeDasharray={2 * Math.PI * 56}
+                    strokeDashoffset={
+                      2 * Math.PI * 56 * (1 - tenYearProgressRate / 100)
+                    }
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center text-white text-2xl font-bold">
+                  {tenYearProgressRate.toFixed(0)}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         {/* 収支サマリー */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <div className="flex items-center justify-between mb-2">
