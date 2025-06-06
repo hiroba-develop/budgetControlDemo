@@ -13,6 +13,8 @@ import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
 import ErrorPage from "./pages/ErrorPage";
 import Layout from "./components/Layout";
+import Skills from "./pages/Skills";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App: React.FC = () => {
   // 初期設定が完了しているかチェック（実際の実装では状態管理を使用）
@@ -20,6 +22,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/onboarding" element={<Onboarding />} />
         <Route
@@ -38,6 +41,7 @@ const App: React.FC = () => {
           <Route path="/expense/add" element={<ExpenseAdd />} />
           <Route path="/report" element={<Report />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/skills" element={<Skills />} />
         </Route>
         <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<Navigate to="/error" />} />

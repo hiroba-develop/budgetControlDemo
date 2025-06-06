@@ -10,6 +10,7 @@ import {
   FileText,
   LogOut,
   ChevronRight,
+  Award,
 } from "lucide-react";
 
 interface UserData {
@@ -225,6 +226,25 @@ const Settings: React.FC = () => {
             </div>
           </div>
         ))}
+
+        {/* スキル管理セクション */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <button
+            onClick={() => navigate("/skills")}
+            className="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50"
+          >
+            <div className="flex items-center gap-3">
+              <Award size={20} className="text-blue-600" />
+              <div>
+                <p className="font-medium text-gray-800">スキル管理</p>
+                <p className="text-sm text-gray-500">
+                  あなたのスキルを登録・更新
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={16} className="text-gray-400" />
+          </button>
+        </div>
 
         {/* データ管理セクション */}
         <div className="bg-white rounded-lg shadow-sm">
