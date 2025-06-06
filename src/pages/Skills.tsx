@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
+  Plus,
   X,
   Star,
   Edit2,
+  Save,
   Briefcase,
   Code,
   Palette,
@@ -43,6 +45,7 @@ const Skills: React.FC = () => {
     years: 0,
     description: "",
   });
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
 
   const skillCategories: SkillCategory[] = [
     {
@@ -187,6 +190,19 @@ const Skills: React.FC = () => {
     return acc;
   }, {} as Record<string, Skill[]>);
 
+  const startEditing = (skill: Skill) => {
+    setEditingSkillId(skill.id);
+    setEditingSkill({ ...skill });
+  };
+
+  const handleSave = (skillId: string) => {
+    if (editingSkill) {
+      handleUpdateSkill(skillId, editingSkill);
+      setEditingSkill(null);
+      setEditingSkillId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* ヘッダー */}
@@ -199,7 +215,16 @@ const Skills: React.FC = () => {
             <ArrowLeft size={20} />
           </button>
           <h1 className="text-lg font-bold text-gray-800">スキル管理</h1>
-          <div className="w-8" />
+          {Object.entries(groupedSkills).length === 0 ? (
+            <div className="w-8" />
+          ) : (
+            <button
+              onClick={() => setIsAddingSkill(true)}
+              className="p-2 -mr-2 rounded-full hover:bg-gray-100"
+            >
+              <Plus size={20} />
+            </button>
+          )}
         </div>
       </header>
 
@@ -369,28 +394,38 @@ const Skills: React.FC = () => {
                         <div className="space-y-3">
                           <input
                             type="text"
-                            value={skill.name}
+                            value={editingSkill?.name || ""}
                             onChange={(e) =>
-                              handleUpdateSkill(skill.id, {
-                                name: e.target.value,
-                              })
+                              setEditingSkill((prev) =>
+                                prev ? { ...prev, name: e.target.value } : null
+                              )
                             }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                           <div className="flex items-center justify-between">
                             <div>
-                              {renderStars(skill.level, true, (level) =>
-                                handleUpdateSkill(skill.id, { level })
+                              {renderStars(
+                                editingSkill?.level || 3,
+                                true,
+                                (level) =>
+                                  setEditingSkill((prev) =>
+                                    prev ? { ...prev, level } : null
+                                  )
                               )}
                             </div>
                             <div className="flex items-center gap-2">
                               <input
                                 type="number"
-                                value={skill.years}
+                                value={editingSkill?.years || 0}
                                 onChange={(e) =>
-                                  handleUpdateSkill(skill.id, {
-                                    years: parseInt(e.target.value) || 0,
-                                  })
+                                  setEditingSkill((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          years: parseInt(e.target.value) || 0,
+                                        }
+                                      : null
+                                  )
                                 }
                                 min="0"
                                 max="50"
@@ -400,11 +435,13 @@ const Skills: React.FC = () => {
                             </div>
                           </div>
                           <textarea
-                            value={skill.description || ""}
+                            value={editingSkill?.description || ""}
                             onChange={(e) =>
-                              handleUpdateSkill(skill.id, {
-                                description: e.target.value,
-                              })
+                              setEditingSkill((prev) =>
+                                prev
+                                  ? { ...prev, description: e.target.value }
+                                  : null
+                              )
                             }
                             placeholder="説明を追加"
                             rows={2}
@@ -412,7 +449,7 @@ const Skills: React.FC = () => {
                           />
                           <div className="flex gap-2">
                             <button
-                              onClick={() => setEditingSkillId(null)}
+                              onClick={() => handleSave(skill.id)}
                               className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
                             >
                               保存
@@ -444,7 +481,7 @@ const Skills: React.FC = () => {
                             )}
                           </div>
                           <button
-                            onClick={() => setEditingSkillId(skill.id)}
+                            onClick={() => startEditing(skill)}
                             className="p-2 rounded-full hover:bg-gray-100"
                           >
                             <Edit2 size={16} />
