@@ -7,8 +7,6 @@ import {
   TrendingDown,
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   PieChart,
@@ -21,36 +19,46 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+/**
+ * レポートコンポーネント
+ * 月次の収支レポート、グラフ分析、インサイトを表示する
+ * @returns {JSX.Element} レポート画面のUI
+ */
 const Report: React.FC = () => {
+  // 表示月の状態管理
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // ダミーデータ
+  // 月次データのダミー値定義
   const monthlyData = {
-    income: 850000,
-    expense: 620000,
-    profit: 230000,
-    previousIncome: 780000,
-    previousExpense: 650000,
+    income: 850000, // 当月売上
+    expense: 620000, // 当月経費
+    profit: 230000, // 当月利益
+    previousIncome: 780000, // 前月売上
+    previousExpense: 650000, // 前月経費
   };
 
+  // 売上成長率の計算（前月比・パーセント）
   const incomeGrowth = (
     ((monthlyData.income - monthlyData.previousIncome) /
       monthlyData.previousIncome) *
     100
   ).toFixed(1);
+
+  // 経費変化率の計算（前月比・パーセント）
   const expenseChange = (
     ((monthlyData.expense - monthlyData.previousExpense) /
       monthlyData.previousExpense) *
     100
   ).toFixed(1);
 
-  // グラフ用データ
+  // 月次推移グラフ用のデータ
   const monthlyTrend = [
     { month: "10月", income: 680, expense: 520 },
     { month: "11月", income: 780, expense: 650 },
     { month: "12月", income: 850, expense: 620 },
   ];
 
+  // 経費内訳のデータ定義
   const expenseBreakdown = [
     { name: "仕入れ", value: 248000, percentage: 40 },
     { name: "広告費", value: 124000, percentage: 20 },
@@ -59,19 +67,25 @@ const Report: React.FC = () => {
     { name: "その他", value: 93000, percentage: 15 },
   ];
 
-  const dailyTrend = Array.from({ length: 30 }, (_, i) => ({
-    day: i + 1,
-    amount: Math.floor(Math.random() * 50000 + 10000),
-  }));
-
+  // 円グラフの色定義
   const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
+  /**
+   * 金額を表示用にフォーマットする
+   * @param {number} amount - フォーマットする金額
+   * @returns {string} 「○○千円」形式の文字列
+   */
   const formatCurrency = (amount: number) => {
     return `${(amount / 1000).toFixed(0)}千円`;
   };
 
+  /**
+   * 表示月を変更する
+   * @param {('prev'|'next')} direction - 変更する方向
+   */
   const changeMonth = (direction: "prev" | "next") => {
     const newMonth = new Date(currentMonth);
+    // 前月または翌月に変更
     if (direction === "prev") {
       newMonth.setMonth(newMonth.getMonth() - 1);
     } else {
@@ -80,11 +94,18 @@ const Report: React.FC = () => {
     setCurrentMonth(newMonth);
   };
 
+  /**
+   * PDFレポートを出力する
+   * 現在は未実装の通知のみ
+   */
   const handleExportPDF = () => {
-    // PDF出力処理
+    // PDF出力機能は未実装
     alert("PDF出力機能は実装予定です");
   };
 
+  /**
+   * 現在表示中の月が現在の月かどうかを判定
+   */
   const isCurrentMonth =
     currentMonth.getMonth() === new Date().getMonth() &&
     currentMonth.getFullYear() === new Date().getFullYear();
@@ -222,7 +243,7 @@ const Report: React.FC = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {expenseBreakdown.map((entry, index) => (
+                    {expenseBreakdown.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}

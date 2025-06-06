@@ -21,15 +21,25 @@ interface Category {
   color: string;
 }
 
+/**
+ * 経費入力コンポーネント
+ * 経費の登録機能を提供し、金額、カテゴリ、日付、メモを入力可能
+ * 連続入力モードにも対応
+ * @returns {JSX.Element} 経費入力フォームのUI
+ */
 const ExpenseAdd: React.FC = () => {
+  // ナビゲーション用のフック
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [memo, setMemo] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [continuousMode, setContinuousMode] = useState(false);
 
+  // 入力データの状態管理
+  const [amount, setAmount] = useState(""); // 金額
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // 日付
+  const [memo, setMemo] = useState(""); // メモ
+  const [selectedCategory, setSelectedCategory] = useState<string>(""); // 選択されたカテゴリ
+  const [showSuccess, setShowSuccess] = useState(false); // 成功表示の状態
+  const [continuousMode, setContinuousMode] = useState(false); // 連続入力モードの状態
+
+  // 経費カテゴリの定義
   const categories: Category[] = [
     {
       id: "transport",
@@ -87,21 +97,26 @@ const ExpenseAdd: React.FC = () => {
     },
   ];
 
-  const handleAmountChange = (value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setAmount(numericValue);
-  };
-
+  /**
+   * 表示用に金額をフォーマットする
+   * @param {string} value - フォーマットする金額
+   * @returns {string} カンマ区切りの金額文字列
+   */
   const formatDisplayAmount = (value: string) => {
     if (!value) return "";
     const num = parseInt(value, 10);
     return num.toLocaleString("ja-JP");
   };
 
+  /**
+   * 経費データを保存する
+   * バリデーション、保存処理、成功表示を行う
+   */
   const handleSubmit = async () => {
+    // 必須項目のバリデーション
     if (!amount || parseInt(amount) === 0 || !selectedCategory) return;
 
-    // 保存処理
+    // 経費データの保存（実際の実装ではAPI呼び出し）
     console.log({
       amount: parseInt(amount),
       date,
@@ -109,10 +124,11 @@ const ExpenseAdd: React.FC = () => {
       memo,
     });
 
+    // 成功表示の制御
     setShowSuccess(true);
 
     if (continuousMode) {
-      // 連続入力モード
+      // 連続入力モード: フォームをリセットして入力を継続
       setTimeout(() => {
         setShowSuccess(false);
         setAmount("");
@@ -120,19 +136,26 @@ const ExpenseAdd: React.FC = () => {
         // カテゴリと日付は保持
       }, 800);
     } else {
-      // 通常モード
+      // 通常モード: ダッシュボードに戻る
       setTimeout(() => {
         navigate("/dashboard");
       }, 800);
     }
   };
 
+  /**
+   * テンキーの入力を処理する
+   * @param {string} num - 押されたキーの値
+   */
   const handleNumberPad = (num: string) => {
     if (num === "clear") {
+      // 入力をクリア
       setAmount("");
     } else if (num === "delete") {
+      // 最後の1文字を削除
       setAmount(amount.slice(0, -1));
     } else {
+      // 数値を追加
       setAmount(amount + num);
     }
   };

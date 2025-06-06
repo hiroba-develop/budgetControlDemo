@@ -17,23 +17,34 @@ interface Transaction {
   memo?: string;
 }
 
+/**
+ * ダッシュボードコンポーネント
+ * 収支の概要、10年目標の進捗、最近の取引履歴を表示する
+ * @returns {JSX.Element} ダッシュボードのUI
+ */
 const Dashboard: React.FC = () => {
+  // 現在表示中の月を管理するステート
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  // データ更新中の状態を管理するステート
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // ダミーデータ
-  const monthlyTarget = 1000000;
-  const monthlyBudget = 700000;
-  const actualIncome = 850000;
-  const actualExpense = 620000;
-  const balance = actualIncome - actualExpense;
-  const achievementRate = (actualIncome / monthlyTarget) * 100;
+  // 月次の予算と実績のダミーデータ
+  const monthlyTarget = 1000000; // 月間目標額
+  const monthlyBudget = 700000; // 月間予算
+  const actualIncome = 850000; // 実績収入
+  const actualExpense = 620000; // 実績支出
+  const balance = actualIncome - actualExpense; // 収支バランス
+  const achievementRate = (actualIncome / monthlyTarget) * 100; // 目標達成率
 
   // 10年目標進捗ゲージ用のダミーデータ
-  const tenYearTarget = 50000000;
-  const accumulatedProgress = 30000000; // ダミーの進捗（3,000万円）
-  const tenYearProgressRate = (accumulatedProgress / tenYearTarget) * 100;
+  const tenYearTarget = 50000000; // 10年での目標金額
+  const accumulatedProgress = 30000000; // 現在までの進捗額
+  const tenYearProgressRate = (accumulatedProgress / tenYearTarget) * 100; // 進捗率
 
+  /**
+   * 最近の取引履歴データ
+   * 収入と支出の履歴を保持する配列
+   */
   const recentTransactions: Transaction[] = [
     {
       id: "1",
@@ -58,17 +69,30 @@ const Dashboard: React.FC = () => {
     },
   ];
 
+  /**
+   * データを更新する非同期関数
+   * ローディング状態を管理しながらデータを更新する
+   */
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // データ更新処理
+    // 1秒間のダミーの更新処理
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsRefreshing(false);
   };
 
+  /**
+   * 金額を表示用にフォーマットする
+   * @param {number} amount - フォーマットする金額
+   * @returns {string} 「○○千円」形式の文字列
+   */
   const formatCurrency = (amount: number) => {
     return `${(amount / 1000).toFixed(0)}千円`;
   };
 
+  /**
+   * 表示月を変更する
+   * @param {('prev'|'next')} direction - 変更する方向
+   */
   const changeMonth = (direction: "prev" | "next") => {
     const newMonth = new Date(currentMonth);
     if (direction === "prev") {
@@ -79,6 +103,9 @@ const Dashboard: React.FC = () => {
     setCurrentMonth(newMonth);
   };
 
+  /**
+   * 現在表示中の月が現在の月かどうかを判定
+   */
   const isCurrentMonth =
     currentMonth.getMonth() === new Date().getMonth() &&
     currentMonth.getFullYear() === new Date().getFullYear();

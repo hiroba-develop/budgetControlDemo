@@ -1,32 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check } from "lucide-react";
 
+/**
+ * 売上入力コンポーネント
+ * 売上の登録機能を提供し、金額、日付、取引先、メモを入力可能
+ * @returns {JSX.Element} 売上入力フォームのUI
+ */
 const IncomeAdd: React.FC = () => {
+  // ナビゲーション用のフック
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [memo, setMemo] = useState("");
-  const [client, setClient] = useState("");
+
+  // 入力データの状態管理
+  const [amount, setAmount] = useState(""); // 金額
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // 日付
+  const [memo, setMemo] = useState(""); // メモ
+  const [client, setClient] = useState(""); // 取引先
+
+  // 最近の取引先データ
   const [recentClients] = useState(["株式会社A", "株式会社B", "個人事業主C"]);
+
+  // 成功表示の状態管理
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleAmountChange = (value: string) => {
-    // 数値のみ許可
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setAmount(numericValue);
-  };
-
+  /**
+   * 表示用に金額をフォーマットする
+   * @param {string} value - フォーマットする金額
+   * @returns {string} カンマ区切りの金額文字列
+   */
   const formatDisplayAmount = (value: string) => {
     if (!value) return "";
+    // 数値に変換してカンマ区切りでフォーマット
     const num = parseInt(value, 10);
     return num.toLocaleString("ja-JP");
   };
 
+  /**
+   * 売上データを保存する
+   * バリデーション、保存処理、成功表示を行う
+   */
   const handleSubmit = async () => {
+    // 金額の入力チェック
     if (!amount || parseInt(amount) === 0) return;
 
-    // 保存処理（実際の実装では API 呼び出し）
+    // 売上データの保存（実際の実装ではAPI呼び出し）
     console.log({
       amount: parseInt(amount),
       date,
@@ -34,19 +51,28 @@ const IncomeAdd: React.FC = () => {
       client,
     });
 
-    // 成功アニメーション表示
+    // 成功アニメーションの表示制御
     setShowSuccess(true);
+
+    // 0.8秒後にダッシュボードに遷移
     setTimeout(() => {
       navigate("/dashboard");
     }, 800);
   };
 
+  /**
+   * テンキーの入力を処理する
+   * @param {string} num - 押されたキーの値
+   */
   const handleNumberPad = (num: string) => {
     if (num === "clear") {
+      // 入力をクリア
       setAmount("");
     } else if (num === "delete") {
+      // 最後の1文字を削除
       setAmount(amount.slice(0, -1));
     } else {
+      // 数値を追加（連結）
       setAmount(amount + num);
     }
   };

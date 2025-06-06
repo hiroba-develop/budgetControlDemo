@@ -13,16 +13,28 @@ import {
   Award,
 } from "lucide-react";
 
+/**
+ * 設定画面のインターフェース定義
+ * ユーザーの基本情報と目標設定を管理
+ */
 interface UserData {
-  nickname: string;
-  businessStartDate: string;
-  businessType: string;
-  monthlyTarget: string;
-  monthlyBudget: string;
+  nickname: string; // ユーザーのニックネーム
+  businessStartDate: string; // 事業開始年月
+  businessType: string; // 業種
+  monthlyTarget: string; // 月間売上目標
+  monthlyBudget: string; // 月間経費予算
 }
 
+/**
+ * 設定コンポーネント
+ * ユーザー情報の表示・編集、各種設定の管理を行う
+ * @returns {JSX.Element} 設定画面のUI
+ */
 const Settings: React.FC = () => {
+  // ナビゲーション用のフック
   const navigate = useNavigate();
+
+  // ユーザーデータの状態管理
   const [userData, setUserData] = useState<UserData>({
     nickname: "",
     businessStartDate: "",
@@ -30,11 +42,19 @@ const Settings: React.FC = () => {
     monthlyTarget: "",
     monthlyBudget: "",
   });
+
+  // 編集モードの状態管理
   const [isEditing, setIsEditing] = useState(false);
   const [editingField, setEditingField] = useState<string>("");
+
+  // その他の設定状態管理
   const [notifications, setNotifications] = useState(true);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
+  /**
+   * 初期データの読み込み
+   * コンポーネントマウント時にローカルストレージからデータを取得
+   */
   useEffect(() => {
     // ローカルストレージからユーザーデータを取得
     const savedData = localStorage.getItem("userData");
@@ -43,38 +63,68 @@ const Settings: React.FC = () => {
     }
   }, []);
 
+  /**
+   * 変更したデータを保存する
+   * ローカルストレージに保存し、編集モードを終了
+   */
   const handleSave = () => {
+    // ユーザーデータをローカルストレージに保存
     localStorage.setItem("userData", JSON.stringify(userData));
+    // 編集モードを終了
     setIsEditing(false);
     setEditingField("");
   };
 
+  /**
+   * CSVデータのエクスポート処理
+   * 現在は未実装の通知のみ
+   */
   const handleExportCSV = () => {
-    // CSV出力処理
     alert("CSV出力機能は実装予定です");
   };
 
+  /**
+   * データリセット確認ダイアログを表示
+   */
   const handleDataReset = () => {
     setShowConfirmDialog(true);
   };
 
+  /**
+   * ログアウト処理
+   * オンボーディング状態をリセットしてオンボーディング画面に遷移
+   */
   const handleLogout = () => {
-    // ログアウト処理
+    // オンボーディング状態をクリア
     localStorage.removeItem("isOnboarded");
+    // オンボーディング画面へ遷移
     navigate("/onboarding");
   };
 
+  /**
+   * データリセットの実行
+   * すべてのローカルストレージをクリアしてオンボーディング画面に遷移
+   */
   const confirmDataReset = () => {
+    // すべてのローカルストレージをクリア
     localStorage.clear();
+    // オンボーディング画面へ遷移
     navigate("/onboarding");
   };
 
+  /**
+   * 金額を表示用にフォーマットする
+   * @param {string} value - フォーマットする金額
+   * @returns {string} カンマ区切りの金額文字列
+   */
   const formatCurrency = (value: string) => {
     if (!value) return "";
+    // 数値に変換してカンマ区切りでフォーマット
     const num = parseInt(value);
     return num.toLocaleString("ja-JP");
   };
 
+  // 設定セクションの定義
   const settingSections = [
     {
       title: "プロフィール",

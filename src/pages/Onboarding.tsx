@@ -2,17 +2,31 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Building, Target, Sparkles } from "lucide-react";
 
+/**
+ * オンボーディングデータの型定義
+ * ユーザーの基本情報と目標設定を管理
+ */
 interface OnboardingData {
-  nickname: string;
-  businessStartDate: string;
-  businessType: string;
-  monthlyTarget: string;
-  monthlyBudget: string;
+  nickname: string; // ユーザーのニックネーム
+  businessStartDate: string; // 事業開始年月
+  businessType: string; // 業種
+  monthlyTarget: string; // 月間売上目標
+  monthlyBudget: string; // 月間経費予算
 }
 
+/**
+ * オンボーディングコンポーネント
+ * 新規ユーザーの初期設定を3ステップで案内する
+ * @returns {JSX.Element} オンボーディング画面のUI
+ */
 const Onboarding: React.FC = () => {
+  // ナビゲーション用のフック
   const navigate = useNavigate();
+
+  // 現在のステップを管理するステート（1-3）
   const [currentStep, setCurrentStep] = useState(1);
+
+  // オンボーディングデータを管理するステート
   const [data, setData] = useState<OnboardingData>({
     nickname: "",
     businessStartDate: "",
@@ -21,6 +35,7 @@ const Onboarding: React.FC = () => {
     monthlyBudget: "",
   });
 
+  // 業種の選択肢
   const businessTypes = [
     "IT・Web制作",
     "コンサルティング",
@@ -32,39 +47,63 @@ const Onboarding: React.FC = () => {
     "その他",
   ];
 
+  /**
+   * 次のステップに進む処理
+   * 最終ステップでは完了処理を実行
+   */
   const handleNext = () => {
     if (currentStep < 3) {
+      // 次のステップに進む
       setCurrentStep(currentStep + 1);
     } else {
-      // 完了処理
+      // オンボーディング完了の処理
       localStorage.setItem("isOnboarded", "true");
       localStorage.setItem("userData", JSON.stringify(data));
       navigate("/dashboard");
     }
   };
 
+  /**
+   * 前のステップに戻る処理
+   */
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
+  /**
+   * 目標設定をスキップする処理
+   * ステップ2からステップ3に直接進む
+   */
   const handleSkip = () => {
     if (currentStep === 2) {
       setCurrentStep(3);
     }
   };
 
+  /**
+   * 次のステップに進めるかどうかを判定
+   * @returns {boolean} 進行可能な場合はtrue
+   */
   const canProceed = () => {
     if (currentStep === 1) {
+      // ステップ1ではニックネームが必須
       return data.nickname.trim() !== "";
     }
     return true;
   };
 
+  /**
+   * 金額を表示用にフォーマット
+   * @param {string} value - フォーマットする金額
+   * @returns {string} カンマ区切りの金額文字列
+   */
   const formatCurrency = (value: string) => {
+    // 数値以外の文字を除去
     const num = value.replace(/[^0-9]/g, "");
     if (!num) return "";
+    // カンマ区切りでフォーマット
     return parseInt(num).toLocaleString("ja-JP");
   };
 

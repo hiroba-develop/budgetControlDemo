@@ -6,7 +6,6 @@ import {
   X,
   Star,
   Edit2,
-  Save,
   Briefcase,
   Code,
   Palette,
@@ -17,27 +16,98 @@ import {
   PenTool,
 } from "lucide-react";
 
+/**
+ * スキルデータの型定義
+ * スキルの基本情報と詳細を管理
+ */
 interface Skill {
-  id: string;
-  name: string;
-  level: number; // 1-5
-  category: string;
-  years: number;
-  description?: string;
+  id: string; // スキルの一意識別子
+  name: string; // スキル名
+  level: number; // スキルレベル（1-5）
+  category: string; // カテゴリID
+  years: number; // 経験年数
+  description?: string; // 説明文（任意）
 }
 
+/**
+ * スキルカテゴリの型定義
+ * カテゴリの表示情報を管理
+ */
 interface SkillCategory {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  color: string;
+  id: string; // カテゴリの一意識別子
+  name: string; // カテゴリ名
+  icon: React.ReactNode; // アイコンコンポーネント
+  color: string; // カテゴリの色設定
 }
 
+const skillCategories: SkillCategory[] = [
+  {
+    id: "business",
+    name: "ビジネス",
+    icon: <Briefcase size={20} />,
+    color: "bg-blue-100 text-blue-600",
+  },
+  {
+    id: "tech",
+    name: "テクノロジー",
+    icon: <Code size={20} />,
+    color: "bg-green-100 text-green-600",
+  },
+  {
+    id: "design",
+    name: "デザイン",
+    icon: <Palette size={20} />,
+    color: "bg-purple-100 text-purple-600",
+  },
+  {
+    id: "marketing",
+    name: "マーケティング",
+    icon: <Megaphone size={20} />,
+    color: "bg-orange-100 text-orange-600",
+  },
+  {
+    id: "sales",
+    name: "営業",
+    icon: <TrendingUp size={20} />,
+    color: "bg-red-100 text-red-600",
+  },
+  {
+    id: "management",
+    name: "マネジメント",
+    icon: <Users size={20} />,
+    color: "bg-indigo-100 text-indigo-600",
+  },
+  {
+    id: "creative",
+    name: "クリエイティブ",
+    icon: <Camera size={20} />,
+    color: "bg-pink-100 text-pink-600",
+  },
+  {
+    id: "other",
+    name: "その他",
+    icon: <PenTool size={20} />,
+    color: "bg-gray-100 text-gray-600",
+  },
+];
+
+/**
+ * スキル管理コンポーネント
+ * スキルの一覧表示、追加、編集、削除機能を提供
+ * @returns {JSX.Element} スキル管理画面のUI
+ */
 const Skills: React.FC = () => {
+  // ナビゲーション用のフック
   const navigate = useNavigate();
+
+  // スキルデータの状態管理
   const [skills, setSkills] = useState<Skill[]>([]);
+  // スキル追加モードの状態管理
   const [isAddingSkill, setIsAddingSkill] = useState(false);
+  // 編集中のスキルIDの状態管理
   const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
+
+  // 新規スキル用の一時データ
   const [newSkill, setNewSkill] = useState<Partial<Skill>>({
     name: "",
     level: 3,
@@ -45,59 +115,13 @@ const Skills: React.FC = () => {
     years: 0,
     description: "",
   });
+
+  // 編集中のスキルデータ
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
 
-  const skillCategories: SkillCategory[] = [
-    {
-      id: "business",
-      name: "ビジネス",
-      icon: <Briefcase size={20} />,
-      color: "bg-blue-100 text-blue-600",
-    },
-    {
-      id: "tech",
-      name: "テクノロジー",
-      icon: <Code size={20} />,
-      color: "bg-green-100 text-green-600",
-    },
-    {
-      id: "design",
-      name: "デザイン",
-      icon: <Palette size={20} />,
-      color: "bg-purple-100 text-purple-600",
-    },
-    {
-      id: "marketing",
-      name: "マーケティング",
-      icon: <Megaphone size={20} />,
-      color: "bg-orange-100 text-orange-600",
-    },
-    {
-      id: "sales",
-      name: "営業",
-      icon: <TrendingUp size={20} />,
-      color: "bg-red-100 text-red-600",
-    },
-    {
-      id: "management",
-      name: "マネジメント",
-      icon: <Users size={20} />,
-      color: "bg-indigo-100 text-indigo-600",
-    },
-    {
-      id: "creative",
-      name: "クリエイティブ",
-      icon: <Camera size={20} />,
-      color: "bg-pink-100 text-pink-600",
-    },
-    {
-      id: "other",
-      name: "その他",
-      icon: <PenTool size={20} />,
-      color: "bg-gray-100 text-gray-600",
-    },
-  ];
-
+  /**
+   * コンポーネントのマウント時にローカルストレージからデータを読み込む
+   */
   useEffect(() => {
     // ローカルストレージからスキルデータを取得
     const savedSkills = localStorage.getItem("userSkills");
@@ -106,14 +130,26 @@ const Skills: React.FC = () => {
     }
   }, []);
 
+  /**
+   * スキルデータをローカルストレージに保存
+   * @param {Skill[]} updatedSkills - 更新後のスキル配列
+   */
   const saveSkills = (updatedSkills: Skill[]) => {
+    // ローカルストレージに保存
     localStorage.setItem("userSkills", JSON.stringify(updatedSkills));
+    // 状態を更新
     setSkills(updatedSkills);
   };
 
+  /**
+   * 新規スキルを追加
+   * バリデーションと保存処理を実行
+   */
   const handleAddSkill = () => {
+    // 必須項目のバリデーション
     if (!newSkill.name || !newSkill.category) return;
 
+    // 新規スキルオブジェクトの作成
     const skill: Skill = {
       id: Date.now().toString(),
       name: newSkill.name,
@@ -123,6 +159,7 @@ const Skills: React.FC = () => {
       description: newSkill.description,
     };
 
+    // スキルの保存と入力フォームのリセット
     saveSkills([...skills, skill]);
     setNewSkill({
       name: "",
@@ -134,7 +171,13 @@ const Skills: React.FC = () => {
     setIsAddingSkill(false);
   };
 
+  /**
+   * 既存のスキルを更新
+   * @param {string} skillId - 更新対象のスキルID
+   * @param {Partial<Skill>} updatedSkill - 更新するスキルデータ
+   */
   const handleUpdateSkill = (skillId: string, updatedSkill: Partial<Skill>) => {
+    // 該当スキルの更新
     const updatedSkills = skills.map((skill) =>
       skill.id === skillId ? { ...skill, ...updatedSkill } : skill
     );
@@ -142,11 +185,21 @@ const Skills: React.FC = () => {
     setEditingSkillId(null);
   };
 
+  /**
+   * スキルを削除
+   * @param {string} skillId - 削除対象のスキルID
+   */
   const handleDeleteSkill = (skillId: string) => {
+    // 該当スキルを除外した配列を作成
     const updatedSkills = skills.filter((skill) => skill.id !== skillId);
     saveSkills(updatedSkills);
   };
 
+  /**
+   * カテゴリ情報を取得
+   * @param {string} categoryId - カテゴリID
+   * @returns {SkillCategory} カテゴリ情報
+   */
   const getCategoryInfo = (categoryId: string) => {
     return (
       skillCategories.find((cat) => cat.id === categoryId) ||
@@ -154,6 +207,13 @@ const Skills: React.FC = () => {
     );
   };
 
+  /**
+   * スキルレベルの星評価を表示
+   * @param {number} level - スキルレベル（1-5）
+   * @param {boolean} interactive - 編集可能かどうか
+   * @param {function} onChange - レベル変更時のコールバック
+   * @returns {JSX.Element} 星評価のUI
+   */
   const renderStars = (
     level: number,
     interactive = false,

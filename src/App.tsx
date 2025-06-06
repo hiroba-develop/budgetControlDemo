@@ -16,28 +16,42 @@ import Layout from "./components/Layout";
 import Skills from "./pages/Skills";
 import ScrollToTop from "./components/ScrollToTop";
 
+/**
+ * アプリケーションのルートコンポーネント
+ * ルーティングの設定とオンボーディング状態に基づいた画面遷移の制御を行う
+ * @returns {JSX.Element} アプリケーションのルーティング構造
+ */
 const App: React.FC = () => {
-  // 初期設定が完了しているかチェック（実際の実装では状態管理を使用）
+  // ローカルストレージからオンボーディング完了状態を取得
   const isOnboarded = localStorage.getItem("isOnboarded") === "true";
 
   return (
+    // GitHub Pages用のベースパスを設定したルーター
     <Router basename="/budgetControlDemo">
-      {" "}
-      {/* basename を追加 */}
+      {/* ページ遷移時のスクロール位置をリセット */}
       <ScrollToTop />
+
       <Routes>
+        {/* オンボーディング画面のルート */}
         <Route path="/onboarding" element={<Onboarding />} />
+
+        {/* ルートパスへのアクセス時の条件付きリダイレクト */}
         <Route
           path="/"
           element={
             isOnboarded ? (
+              // オンボーディング完了時はダッシュボードへ
               <Navigate to="/dashboard" />
             ) : (
+              // 未完了時はオンボーディングへ
               <Navigate to="/onboarding" />
             )
           }
         />
+
+        {/* 共通レイアウトを適用するルート群 */}
         <Route element={<Layout />}>
+          {/* メイン機能のルート定義 */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/income/add" element={<IncomeAdd />} />
           <Route path="/expense/add" element={<ExpenseAdd />} />
@@ -45,7 +59,10 @@ const App: React.FC = () => {
           <Route path="/settings" element={<Settings />} />
           <Route path="/skills" element={<Skills />} />
         </Route>
+
+        {/* エラー処理用のルート */}
         <Route path="/error" element={<ErrorPage />} />
+        {/* 未定義のパスはすべてエラーページへ */}
         <Route path="*" element={<Navigate to="/error" />} />
       </Routes>
     </Router>
